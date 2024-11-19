@@ -1,0 +1,30 @@
+.NavBarContainer{
+    width: 85%;
+    height: 10%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    box-shadow: 3px 3px 7px;
+    margin: 0 auto;
+}  
+
+a {
+    vertical-align: middle;
+    color: white;
+    text-decoration: none;
+    margin-left: 8px;
+}
+
+h2 {
+
+    margin-right: 8px;
+}
+
+.nav-divider {
+    display: inline-block;
+    width: 1px;
+    height: 30px; 
+    background-color: white;
+    margin: 0 10px; 
+  }
