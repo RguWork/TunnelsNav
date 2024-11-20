@@ -1,0 +1,56 @@
+.searchContainer{
+    height: 105vh;
+    margin: 0 auto;
+    margin-bottom: 20vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    overflow: hidden;
+    position: relative;
+    /* box-shadow: 3px 3px 7px; */
+
+    /* background: 
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)),
+      url('/Users/rgu/Desktop/projects/tunnels-nav/tunnelnavfrontend/public/placeholdertunnelpic.jpeg'); */
+
+
+    background: 
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)),
+        url('/Users/rgu/Desktop/projects/tunnels-nav/tunnelnavfrontend/public/hallfinal.jpg');
+
+    background-size: cover;
+    background-repeat: no-repeat; 
+    background-position: center; 
+    background-attachment: fixed;
+  }
+
+.left-screen{
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.right-screen{
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.on-screen{
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.introWrapper, .formWrapper{
+    transition: transform 1s ease, opacity 1s ease-in;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    width: 80%;
+    position: absolute;
+}
+
+a {
+    text-decoration: underline;
+}

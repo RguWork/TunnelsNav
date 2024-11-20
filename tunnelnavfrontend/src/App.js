@@ -2,18 +2,14 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import { NavBar } from "./components/NavBar";
-import { InputForm } from "./components/InputForm";
-import { TunnelMap } from "./components/TunnelMap";
+import { SearchSection } from "./components/SearchSection";
 
 function App() {
   return (
     <div className="App">
       <NavBar />
-      <div className="searchContainer">
-        <TunnelMap />
-        <InputForm />
-      </div>
-      <section className="aboutContainer">
+      <SearchSection/>
+      <section id="about" className="aboutContainer">
         <h1>About</h1>
         <p>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sit
