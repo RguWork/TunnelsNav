@@ -24,13 +24,18 @@ export const SearchSection = () => {
               cursus. Nunc ac posuere ipsum, nec bibendum velit. Sed scelerisque
               mollis commodo.
             </p>
-            <a onClick={() => setShowForm(true)}>Link to search</a>
+            <a onClick={() => setShowForm(true)}>Link to search<i className="arrow right"></i></a>
           </div>
 
           <div className={`formWrapper ${showForm ? "on-screen" : "right-screen"}`}>
-            <TunnelMap />
-            <InputForm />
-            <a onClick={() => setShowForm(false)}>Back</a>
+            <div className="miniFormWrapper">
+                <div className="mapContainer">
+                  <TunnelMap />
+                </div>
+                <InputForm />
+
+            </div>
+            <a onClick={() => setShowForm(false)}><i class="arrow left"></i>Back</a>
           </div>
 
     </div>

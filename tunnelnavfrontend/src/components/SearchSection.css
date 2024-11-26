@@ -1,30 +1,32 @@
-.searchContainer{
+.searchContainer {
+    position: relative;
     height: 105vh;
     margin: 0 auto;
     margin-bottom: 20vh;
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
     color: white;
     overflow: hidden;
-    position: relative;
-    /* box-shadow: 3px 3px 7px; */
-
-    /* background: 
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)),
-      url('/Users/rgu/Desktop/projects/tunnels-nav/tunnelnavfrontend/public/placeholdertunnelpic.jpeg'); */
 
 
-    background: 
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)),
-        url('/Users/rgu/Desktop/projects/tunnels-nav/tunnelnavfrontend/public/hallfinal.jpg');
-
+    background: url('/Users/rgu/Desktop/projects/tunnels-nav/tunnelnavfrontend/public/hallfinal.jpg');
     background-size: cover;
     background-repeat: no-repeat; 
     background-position: center; 
-    background-attachment: fixed;
-  }
+    background-attachment: fixed; 
+}
+
+.searchContainer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3),rgba(0, 0, 0, 0.4),rgba(0, 0, 0, 1));
+    pointer-events: none;
+}
 
 .left-screen{
     opacity: 0;
@@ -41,16 +43,69 @@
     transform: translateX(0);
 }
 
-.introWrapper, .formWrapper{
+.introWrapper {
     transition: transform 1s ease, opacity 1s ease-in;
     display: flex;
     justify-content: center;
     flex-direction: column;
     text-align: center;
-    width: 80%;
+    width: 60%;
     position: absolute;
 }
 
+.miniFormWrapper{
+    width: 100%;
+    height: 95%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    /* box-shadow: 3px 3px 7px; */
+    margin-bottom: 30px;
+}
+
+
+.formWrapper{
+    transition: transform 1s ease, opacity 1s ease-in;
+    display: flex;
+    /* justify-content: center; */
+    flex-direction: column;
+    text-align: center;
+    width: 80%;
+    height: 70%;
+    /* box-shadow: 3px 3px 7px; */
+}
+
+.mapContainer{
+    display: flex;
+    justify-content: center;
+    box-shadow: 3px 3px 7px;
+    width: 50%;
+}
+
+
 a {
+    transition: transform 0.5s ease;
     text-decoration: underline;
+}
+
+a:hover{
+    transform: scale(1.1);
+}
+
+
+.arrow {
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+  }
+  
+.right {
+transform: rotate(-45deg);
+-webkit-transform: rotate(-45deg);
+}
+
+.left {
+transform: rotate(135deg);
+-webkit-transform: rotate(135deg);
 }
