@@ -10,7 +10,7 @@ function App() {
       <NavBar />
       <SearchSection/>
       <section id="about" className="aboutContainer">
-        <h1>About</h1>
+        <h1 className="aboutTitle">About</h1>
         <p>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sit
           amet nisl molestie ante auctor sollicitudin id a mi. Nulla consequat
