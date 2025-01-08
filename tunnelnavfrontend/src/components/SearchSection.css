@@ -10,7 +10,8 @@
     overflow: hidden;
 
 
-    background: url('/Users/rgu/Desktop/projects/tunnels-nav/tunnelnavfrontend/public/hallfinal.jpg');
+    /* background: url('/Users/rgu/Desktop/projects/tunnels-nav/tunnelnavfrontend/public/hallfinal.jpg'); */
+    background: url('../../public/hallfinal.jpg');
     background-size: cover;
     background-repeat: no-repeat; 
     background-position: center; 
