@@ -14,6 +14,8 @@ export const InputForm = () => {
     showIcon: false,
     placeholderText: "Please type your starting location or attach an image",
     imageLink: null,
+    startLocation: {text: "", image: null},
+    destinationLocation: "",
   };
 
   const reducer = (prevState, action) => {
@@ -36,8 +38,37 @@ export const InputForm = () => {
           showIcon: true,
           placeholderText: "",
         };
+      case "SET_START_TEXT":
+        return {
+          ...prevState,
+          startLocation: {...prevState.startLocation, text: action.payload}
+        };
+      case "SET_START_IMAGE":
+        return {
+          ...prevState,
+          startLocation: {...prevState.startLocation, image: action.payload}
+        };
+      case "SET_DESTINATION":
+        return{
+          ...prevState,
+          destinationLocation: action.payload,
+        };
       case "RESET":
-        return initialState;
+          return initialState;
+      case "PARTIAL_RESET":
+        //this is literally for the drag leave behavior.
+        //coded because to see if text exists when an image is dragged over to disable hover properties
+        //it checks startLocation.text. but drag leave, when using reset, resets this value.
+        //so if you dragleave twice it bugs.
+          return {
+            isExpanded: false,
+            isUploaded: false,
+            showIcon: false,
+            placeholderText: "Please type your starting location or attach an image",
+            imageLink: null,
+            startLocation: {...prevState.startLocation, image: null},
+            destinationLocation: "",
+          };
       default:
         return prevState;
     }
@@ -45,19 +76,30 @@ export const InputForm = () => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // write a listener for hovering and for dropping for the startLocation
+  //NOTE: get rid of this post testing
+  useEffect(() => {
+    console.log("state has been updated:", state.startLocation);
+  }, [state.startLocation])
+
+  //write a listener for hovering and for dropping for the startLocation
   //make the inputfield transform visually as well when we hover with an image
   //if an image is dropped, after processed, make it display the image, with an option to remove it
   //so basically, if image stored, stay transformed. otherwise, transform back to text box.
+  let seen = 0;
   useEffect(() => {
     const startLocation = startRef.current; //check if form is rendered
 
     //define event handlers
     const handleDragOver = (e) => {
       e.preventDefault();
-      e.dataTransfer.dropEffect = "copy"; //changes cursor when dragged over to a plus icon
+      if (seen === 0){
+        seen += 1
+        console.log("this is what is seen when this const is called:", state.startLocation.text);
+        console.log("this is the state when this is called:", state.startLocation);
+      }
 
-      if (!state.isExpanded) {
+      if (!state.isExpanded && state.startLocation.text === ""){
+        e.dataTransfer.dropEffect = "copy"; //changes cursor when dragged over to a plus icon
         console.log('trying to expand here');
         dispatch({ type: "EXPAND" });
         // startLocation.classList.add('expanded') //toggles expanded subclass of input
@@ -67,34 +109,23 @@ export const InputForm = () => {
     const handleDragLeave = (e) => {
       e.preventDefault();
       if (state.isExpanded) {
-        dispatch({ type: "RESET" });
+        dispatch({ type: "PARTIAL_RESET" });
       }
     };
 
     const handleDrop = (e) => {
-      // if file is image, just store it in the form. make a way to display the image in the form, and add a button that lets the person
-      // delete the image from input if they want. also make sure that when there is a stored value, you cannot input anymore
-
-      //otherwise, give an alert, saying that the input must be an image
       e.preventDefault();
       const file = e.dataTransfer.files[0]; //takes the first file of the drop
 
-      if (!state.isUploaded) {
+      if (!state.isUploaded && state.startLocation.text === "") {
         if (file && file.type.startsWith("image/")) {
-          //to add: create a temp url of the image: URL.createObjectURL(file)
-          //then show a mini version of the image, placing it on the website using absolute location
-          //and add a delete button (maybe on the right side of the search bar)
-          //and disable further input (i think i can just change the logic of this if else statement, maybe with a state)
 
-          //then cleanup the image url: URL.revokeObjectURL(imagePreview)
-
-          //then, ask about form submission and how it works (text vs image)
-          //also all the states seem redundant, is it redundant? then, how would gpt go about improving it?
+          //NOTE: cleanup the image url: URL.revokeObjectURL(imagePreview)
           dispatch({
             type: "UPLOAD_IMAGE",
             payload: URL.createObjectURL(file),
           });
-          console.log("Image uploaded:", file.name);
+          dispatch({ type: "SET_START_IMAGE", payload: file})
         } else {
           alert("Please input an image file!");
         }
@@ -123,11 +154,57 @@ export const InputForm = () => {
         startLocation.removeEventListener("input", handleText);
       }
     };
-  }, [state.isExpanded, state.isUploaded]);
+  }, [state.isExpanded, state.isUploaded, state.startLocation]);
+
+  const handleStartChange = (e) => {
+    if (e.target.value === ""){
+      dispatch({ type: "SET_START_TEXT", payload: "" })
+    }else{
+      dispatch({ type: "SET_START_TEXT", payload: e.target.value })
+    }
+  }
+
+  const callApi = async (e) => {
+    try {
+      let response = await fetch("http://localhost:5000/api/pathfinding", {
+        method: "POST", //specify method
+        headers: {"Content-Type":"application/json"}, //specify type of content that the request body contains
+        body: JSON.stringify({startLocation: state.startLocation, destinationLocation: state.destinationLocation}) 
+      })
+
+      if (!response.ok){
+        //if there is an issue with the response due to server issues
+        const errorData = await response.json();
+        console.log("Server Error:", errorData.error);
+        return;
+      }
+
+      let data = await response.json()
+
+      if (data.error){
+        window.alert(`Error: ${data.error}`);
+      }
+
+      console.log(data)
+    }catch(err){
+      //if we dont even get a response
+      console.log("Network Error:", err)
+    }
+      
+  } 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log("Start Location (before submit):", state.startLocation);
+    console.log("Destination Location (before submit):", state.destinationLocation);
+
+    await callApi();
+  }
 
   return (
     <div className="formContainer">
-      <form>
+      <form onSubmit={handleSubmit}>
         <h1>Choose your starting point and destination</h1>
 
         <div ref={startRef} className={`inputContainer ${state.isExpanded ? "expanded" : ""}`}> 
@@ -137,6 +214,8 @@ export const InputForm = () => {
             name="startLocation"
             className="startLocation"
             placeholder={state.placeholderText}
+            onChange={(e) => handleStartChange(e)}
+            disabled={state.isUploaded}
           />
           <BiAddToQueue
             className={`inputIcon ${state.showIcon ? "show" : ""}`}
@@ -149,7 +228,11 @@ export const InputForm = () => {
           <button
             type="button"
             className={`${state.isUploaded ? "crossButton" : "hidden"}`}
-            onClick={() => dispatch({ type: "RESET" })}
+            onClick={
+              () => {
+                dispatch({ type: "RESET" });
+              }
+            }
           >
             {" "}
             <RxCross2 style={{ fontSize: "20px" }} />{" "}
@@ -161,9 +244,10 @@ export const InputForm = () => {
             name="destinationLocation"
             className="destinationLocation"
             placeholder="Please type your destination location"
+            onChange={(e) => dispatch({ type:"SET_DESTINATION", payload: e.target.value })}
           />
         </div>
-        <button className="submitButton">Submit</button>
+        <button className="submitButton" type="submit">Submit</button>
       </form>
     </div>
   );

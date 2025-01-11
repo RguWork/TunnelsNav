@@ -45,6 +45,7 @@ input{
     width: 70%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
+    /* background-color: rgba(207, 149, 149, 0.6); */
     padding-left: 10px;
     transform-origin: center;
     position: relative;
