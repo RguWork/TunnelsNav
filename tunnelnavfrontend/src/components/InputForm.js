@@ -67,7 +67,7 @@ export const InputForm = () => {
             placeholderText: "Please type your starting location or attach an image",
             imageLink: null,
             startLocation: {...prevState.startLocation, image: null},
-            destinationLocation: "",
+            destinationLocation: prevState.destinationLocation,
           };
       default:
         return prevState;
@@ -85,48 +85,41 @@ export const InputForm = () => {
   //make the inputfield transform visually as well when we hover with an image
   //if an image is dropped, after processed, make it display the image, with an option to remove it
   //so basically, if image stored, stay transformed. otherwise, transform back to text box.
-  let seen = 0;
+  
   useEffect(() => {
     const startLocation = startRef.current; //check if form is rendered
 
     //define event handlers
     const handleDragOver = (e) => {
       e.preventDefault();
-      if (seen === 0){
-        seen += 1
-        console.log("this is what is seen when this const is called:", state.startLocation.text);
-        console.log("this is the state when this is called:", state.startLocation);
-      }
 
       if (!state.isExpanded && state.startLocation.text === ""){
         e.dataTransfer.dropEffect = "copy"; //changes cursor when dragged over to a plus icon
-        console.log('trying to expand here');
+        // console.log('trying to expand here'); NOTE: DELETE
         dispatch({ type: "EXPAND" });
-        // startLocation.classList.add('expanded') //toggles expanded subclass of input
       }
     };
 
     const handleDragLeave = (e) => {
       e.preventDefault();
-      if (state.isExpanded) {
+      if (state.isExpanded && !state.isUploaded) {
         dispatch({ type: "PARTIAL_RESET" });
       }
     };
 
     const handleDrop = (e) => {
-      e.preventDefault();
-      const file = e.dataTransfer.files[0]; //takes the first file of the drop
+      if (state.startLocation.text === ""){
+        e.preventDefault();
+        const file = e.dataTransfer.files[0]; //takes the first file of the drop
 
-      if (!state.isUploaded && state.startLocation.text === "") {
-        if (file && file.type.startsWith("image/")) {
-
-          //NOTE: cleanup the image url: URL.revokeObjectURL(imagePreview)
+        if (file && file.type.startsWith("image/")){
           dispatch({
-            type: "UPLOAD_IMAGE",
-            payload: URL.createObjectURL(file),
-          });
+                  type: "UPLOAD_IMAGE",
+                  payload: URL.createObjectURL(file),
+                });
           dispatch({ type: "SET_START_IMAGE", payload: file})
-        } else {
+          
+        }else{
           alert("Please input an image file!");
         }
       }
@@ -166,10 +159,14 @@ export const InputForm = () => {
 
   const callApi = async (e) => {
     try {
+      const formData = new FormData();
+      formData.append("startText", state.startLocation.text);
+      formData.append("startImage", state.startLocation.image);
+      formData.append("destinationText", state.destinationLocation);
+
       let response = await fetch("http://localhost:5000/api/pathfinding", {
         method: "POST", //specify method
-        headers: {"Content-Type":"application/json"}, //specify type of content that the request body contains
-        body: JSON.stringify({startLocation: state.startLocation, destinationLocation: state.destinationLocation}) 
+        body: formData,
       })
 
       if (!response.ok){
@@ -182,7 +179,7 @@ export const InputForm = () => {
       let data = await response.json()
 
       if (data.error){
-        window.alert(`Error: ${data.error}`);
+        window.alert(`Error: ${data.error}`); //this is if the app.py returns an error, so like if a location doesnt exist, etc.
       }
 
       console.log(data)
@@ -196,10 +193,12 @@ export const InputForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Start Location (before submit):", state.startLocation);
-    console.log("Destination Location (before submit):", state.destinationLocation);
+    // console.log("Start Location (before submit):", state.startLocation);
+    // console.log("Destination Location (before submit):", state.destinationLocation);
 
     await callApi();
+    console.log("Start Location (after submit):", state.startLocation);
+    console.log("Destination Location (after submit):", state.destinationLocation);
   }
 
   return (
@@ -230,7 +229,7 @@ export const InputForm = () => {
             className={`${state.isUploaded ? "crossButton" : "hidden"}`}
             onClick={
               () => {
-                dispatch({ type: "RESET" });
+                dispatch({ type: "PARTIAL_RESET" });
               }
             }
           >
